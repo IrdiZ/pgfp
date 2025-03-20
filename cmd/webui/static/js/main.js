@@ -100,8 +100,7 @@ function displayResults(data) {
     document.getElementById('alignedRef').textContent = alignedRef;
 
     // Generate and display the match line
-    const matchLine = generateMatchLine(alignedQuery, alignedRef);
-    document.getElementById('alignmentMatch').textContent = matchLine;
+    document.getElementById('alignmentMatch').textContent = generateMatchLine(alignedQuery, alignedRef);
 }
 
 // Generate the match line between two aligned sequences
@@ -169,8 +168,7 @@ function showBatchResultDetail(result) {
     document.getElementById('modalAlignedRef').textContent = result.alignedRef;
 
     // Generate and set the match line
-    const matchLine = generateMatchLine(result.alignedQuery, result.alignedRef);
-    document.getElementById('modalAlignmentMatch').textContent = matchLine;
+    document.getElementById('modalAlignmentMatch').textContent = generateMatchLine(result.alignedQuery, result.alignedRef);
 
     // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('batchDetailModal'));
@@ -263,8 +261,6 @@ function initializePerformanceChart() {
                     callbacks: {
                         label: function(context) {
                             const dataIndex = context.dataIndex;
-                            const datasetIndex = context.datasetIndex;
-
                             // Get the value for the current dataset
                             const value = context.raw.y;
 

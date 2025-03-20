@@ -50,7 +50,7 @@ func SmithWaterman(query, reference string) AlignmentResult {
 			scoreLeft := matrix[i][j-1] + GapPenalty
 
 			// Apply Smith-Waterman scoring rule (no negative scores)
-			matrix[i][j] = max(0, scoreDiag, scoreUp, scoreLeft)
+			matrix[i][j] = smithMax(0, scoreDiag, scoreUp, scoreLeft)
 
 			// Track maximum score for traceback
 			if matrix[i][j] > maxScore {
@@ -120,8 +120,8 @@ func traceback(matrix [][]int, query, reference string, row, col int) (string, s
 	return alignedQuery, alignedRef
 }
 
-// max returns the maximum of the provided integer values.
-func max(values ...int) int {
+// smithMax returns the maximum of the provided integer values.
+func smithMax(values ...int) int {
 	maxVal := values[0]
 	for _, v := range values[1:] {
 		if v > maxVal {

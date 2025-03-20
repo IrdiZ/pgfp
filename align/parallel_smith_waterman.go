@@ -89,7 +89,7 @@ func ParallelSmithWaterman(query, reference string, numWorkers int) ParallelAlig
 				scoreLeft := matrix[i][j-1] + GapPenalty
 
 				// Apply Smith-Waterman scoring rule (no negative scores)
-				matrix[i][j] = max(0, scoreDiag, scoreUp, scoreLeft)
+				matrix[i][j] = smithMax(0, scoreDiag, scoreUp, scoreLeft)
 
 				// Track maximum score for traceback
 				if matrix[i][j] > 0 {

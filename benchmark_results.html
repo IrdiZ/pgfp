@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smith-Waterman Algorithm Performance Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .chart-container { height: 400px; margin-bottom: 30px; }
+        .result-table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        .result-table th, .result-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .result-table tr:nth-child(even) { background-color: #f2f2f2; }
+        .result-table th { padding-top: 12px; padding-bottom: 12px; background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Smith-Waterman Algorithm Performance Analysis</h1>
+    
+    <h2>Execution Time Comparison</h2>
+    <div class="chart-container">
+        <canvas id="timeChart"></canvas>
+    </div>
+    
+    <h2>Speedup Comparison</h2>
+    <div class="chart-container">
+        <canvas id="speedupChart"></canvas>
+    </div>
+    
+    <h2>Memory Usage</h2>
+    <div class="chart-container">
+        <canvas id="memoryChart"></canvas>
+    </div>
+    
+    <h2>Batch Processing Performance</h2>
+    <div class="chart-container">
+        <canvas id="batchChart"></canvas>
+    </div>
+    
+    <h2>Detailed Results</h2>
+    <table class="result-table">
+        <tr>
+            <th>Mode</th>
+            <th>Sequence Length</th>
+            <th>Workers</th>
+            <th>Execution Time (ms)</th>
+            <th>Memory Usage (MB)</th>
+            <th>Score</th>
+            <th>Speedup</th>
+        </tr>
+        <tr>
+            <td>Sequential</td>
+            <td>100</td>
+            <td>1</td>
+            <td>0.00</td>
+            <td>0</td>
+            <td>53</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>Sequential</td>
+            <td>500</td>
+            <td>1</td>
+            <td>2.00</td>
+            <td>2</td>
+            <td>221</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>Sequential</td>
+            <td>1000</td>
+            <td>1</td>
+            <td>9.91</td>
+            <td>8</td>
+            <td>461</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>Sequential</td>
+            <td>2000</td>
+            <td>1</td>
+            <td>41.01</td>
+            <td>36</td>
+            <td>908</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>100</td>
+            <td>1</td>
+            <td>0.67</td>
+            <td>0</td>
+            <td>15</td>
+            <td>0.00</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>100</td>
+            <td>2</td>
+            <td>0.67</td>
+            <td>0</td>
+            <td>14</td>
+            <td>0.00</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>100</td>
+            <td>4</td>
+            <td>1.00</td>
+            <td>0</td>
+            <td>12</td>
+            <td>0.00</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>100</td>
+            <td>8</td>
+            <td>0.67</td>
+            <td>0</td>
+            <td>10</td>
+            <td>0.00</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>100</td>
+            <td>8</td>
+            <td>1.00</td>
+            <td>0</td>
+            <td>10</td>
+            <td>0.00</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>500</td>
+            <td>1</td>
+            <td>17.00</td>
+            <td>2</td>
+            <td>10</td>
+            <td>0.12</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>500</td>
+            <td>2</td>
+            <td>18.33</td>
+            <td>2</td>
+            <td>11</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>500</td>
+            <td>4</td>
+            <td>19.67</td>
+            <td>2</td>
+            <td>14</td>
+            <td>0.10</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>500</td>
+            <td>8</td>
+            <td>20.00</td>
+            <td>2</td>
+            <td>17</td>
+            <td>0.10</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>500</td>
+            <td>8</td>
+            <td>20.00</td>
+            <td>2</td>
+            <td>13</td>
+            <td>0.10</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>1000</td>
+            <td>1</td>
+            <td>89.00</td>
+            <td>9</td>
+            <td>13</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>1000</td>
+            <td>2</td>
+            <td>93.00</td>
+            <td>9</td>
+            <td>11</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>1000</td>
+            <td>4</td>
+            <td>93.51</td>
+            <td>9</td>
+            <td>13</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>1000</td>
+            <td>8</td>
+            <td>100.67</td>
+            <td>9</td>
+            <td>17</td>
+            <td>0.10</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>1000</td>
+            <td>8</td>
+            <td>106.33</td>
+            <td>9</td>
+            <td>14</td>
+            <td>0.09</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>2000</td>
+            <td>1</td>
+            <td>386.51</td>
+            <td>34</td>
+            <td>16</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>2000</td>
+            <td>2</td>
+            <td>378.17</td>
+            <td>34</td>
+            <td>17</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>2000</td>
+            <td>4</td>
+            <td>395.35</td>
+            <td>34</td>
+            <td>16</td>
+            <td>0.10</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>2000</td>
+            <td>8</td>
+            <td>374.84</td>
+            <td>34</td>
+            <td>16</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>Parallel</td>
+            <td>2000</td>
+            <td>8</td>
+            <td>378.84</td>
+            <td>34</td>
+            <td>14</td>
+            <td>0.11</td>
+        </tr>
+        <tr>
+            <td>BatchSequential</td>
+            <td>100</td>
+            <td>1</td>
+            <td>7.33</td>
+            <td>6</td>
+            <td>44</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>BatchSequential</td>
+            <td>500</td>
+            <td>1</td>
+            <td>150.66</td>
+            <td>102</td>
+            <td>225</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>BatchSequential</td>
+            <td>1000</td>
+            <td>1</td>
+            <td>512.61</td>
+            <td>409</td>
+            <td>441</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>BatchSequential</td>
+            <td>2000</td>
+            <td>1</td>
+            <td>2029.84</td>
+            <td>1598</td>
+            <td>890</td>
+            <td>1.00</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>100</td>
+            <td>1</td>
+            <td>6.67</td>
+            <td>6</td>
+            <td>44</td>
+            <td>1.10</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>100</td>
+            <td>2</td>
+            <td>5.00</td>
+            <td>6</td>
+            <td>44</td>
+            <td>1.47</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>100</td>
+            <td>4</td>
+            <td>3.53</td>
+            <td>6</td>
+            <td>44</td>
+            <td>2.08</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>100</td>
+            <td>8</td>
+            <td>3.67</td>
+            <td>6</td>
+            <td>44</td>
+            <td>2.00</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>100</td>
+            <td>8</td>
+            <td>3.98</td>
+            <td>6</td>
+            <td>44</td>
+            <td>1.84</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>500</td>
+            <td>1</td>
+            <td>123.01</td>
+            <td>104</td>
+            <td>225</td>
+            <td>1.22</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>500</td>
+            <td>2</td>
+            <td>76.55</td>
+            <td>101</td>
+            <td>225</td>
+            <td>1.97</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>500</td>
+            <td>4</td>
+            <td>53.33</td>
+            <td>101</td>
+            <td>225</td>
+            <td>2.82</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>500</td>
+            <td>8</td>
+            <td>44.33</td>
+            <td>108</td>
+            <td>225</td>
+            <td>3.40</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>500</td>
+            <td>8</td>
+            <td>50.33</td>
+            <td>107</td>
+            <td>225</td>
+            <td>2.99</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>1000</td>
+            <td>1</td>
+            <td>422.14</td>
+            <td>406</td>
+            <td>441</td>
+            <td>1.21</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>1000</td>
+            <td>2</td>
+            <td>255.96</td>
+            <td>399</td>
+            <td>441</td>
+            <td>2.00</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>1000</td>
+            <td>4</td>
+            <td>201.00</td>
+            <td>403</td>
+            <td>441</td>
+            <td>2.55</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>1000</td>
+            <td>8</td>
+            <td>171.62</td>
+            <td>420</td>
+            <td>441</td>
+            <td>2.99</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>1000</td>
+            <td>8</td>
+            <td>176.95</td>
+            <td>420</td>
+            <td>441</td>
+            <td>2.90</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>2000</td>
+            <td>1</td>
+            <td>1629.40</td>
+            <td>1628</td>
+            <td>890</td>
+            <td>1.25</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>2000</td>
+            <td>2</td>
+            <td>1166.31</td>
+            <td>1610</td>
+            <td>890</td>
+            <td>1.74</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>2000</td>
+            <td>4</td>
+            <td>884.44</td>
+            <td>1661</td>
+            <td>890</td>
+            <td>2.30</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>2000</td>
+            <td>8</td>
+            <td>654.17</td>
+            <td>1585</td>
+            <td>890</td>
+            <td>3.10</td>
+        </tr>
+        <tr>
+            <td>BatchParallel</td>
+            <td>2000</td>
+            <td>8</td>
+            <td>665.45</td>
+            <td>1642</td>
+            <td>890</td>
+            <td>3.05</td>
+        </tr>
+    </table>
+    
+    <script>
+        // Prepare data for charts
+        const sequentialData = [];
+        const parallelData = [];
+        const batchSequentialData = [];
+        const batchParallelData = [];
+        // Sequential data
+        sequentialData.push({ length: 100, time: 0.00, memory: 0, score: 53 });
+        sequentialData.push({ length: 500, time: 2.00, memory: 2, score: 221 });
+        sequentialData.push({ length: 1000, time: 9.91, memory: 8, score: 461 });
+        sequentialData.push({ length: 2000, time: 41.01, memory: 36, score: 908 });
+
+        // Parallel data
+        parallelData.push({ length: 100, workers: 1, time: 0.67, memory: 0, score: 15, speedup: 0.00 });
+        parallelData.push({ length: 100, workers: 2, time: 0.67, memory: 0, score: 14, speedup: 0.00 });
+        parallelData.push({ length: 100, workers: 4, time: 1.00, memory: 0, score: 12, speedup: 0.00 });
+        parallelData.push({ length: 100, workers: 8, time: 0.67, memory: 0, score: 10, speedup: 0.00 });
+        parallelData.push({ length: 100, workers: 8, time: 1.00, memory: 0, score: 10, speedup: 0.00 });
+        parallelData.push({ length: 500, workers: 1, time: 17.00, memory: 2, score: 10, speedup: 0.12 });
+        parallelData.push({ length: 500, workers: 2, time: 18.33, memory: 2, score: 11, speedup: 0.11 });
+        parallelData.push({ length: 500, workers: 4, time: 19.67, memory: 2, score: 14, speedup: 0.10 });
+        parallelData.push({ length: 500, workers: 8, time: 20.00, memory: 2, score: 17, speedup: 0.10 });
+        parallelData.push({ length: 500, workers: 8, time: 20.00, memory: 2, score: 13, speedup: 0.10 });
+        parallelData.push({ length: 1000, workers: 1, time: 89.00, memory: 9, score: 13, speedup: 0.11 });
+        parallelData.push({ length: 1000, workers: 2, time: 93.00, memory: 9, score: 11, speedup: 0.11 });
+        parallelData.push({ length: 1000, workers: 4, time: 93.51, memory: 9, score: 13, speedup: 0.11 });
+        parallelData.push({ length: 1000, workers: 8, time: 100.67, memory: 9, score: 17, speedup: 0.10 });
+        parallelData.push({ length: 1000, workers: 8, time: 106.33, memory: 9, score: 14, speedup: 0.09 });
+        parallelData.push({ length: 2000, workers: 1, time: 386.51, memory: 34, score: 16, speedup: 0.11 });
+        parallelData.push({ length: 2000, workers: 2, time: 378.17, memory: 34, score: 17, speedup: 0.11 });
+        parallelData.push({ length: 2000, workers: 4, time: 395.35, memory: 34, score: 16, speedup: 0.10 });
+        parallelData.push({ length: 2000, workers: 8, time: 374.84, memory: 34, score: 16, speedup: 0.11 });
+        parallelData.push({ length: 2000, workers: 8, time: 378.84, memory: 34, score: 14, speedup: 0.11 });
+
+        // Batch Sequential data
+        batchSequentialData.push({ length: 100, time: 7.33, memory: 6, score: 44 });
+        batchSequentialData.push({ length: 500, time: 150.66, memory: 102, score: 225 });
+        batchSequentialData.push({ length: 1000, time: 512.61, memory: 409, score: 441 });
+        batchSequentialData.push({ length: 2000, time: 2029.84, memory: 1598, score: 890 });
+
+        // Batch Parallel data
+        batchParallelData.push({ length: 100, workers: 1, time: 6.67, memory: 6, score: 44, speedup: 1.10 });
+        batchParallelData.push({ length: 100, workers: 2, time: 5.00, memory: 6, score: 44, speedup: 1.47 });
+        batchParallelData.push({ length: 100, workers: 4, time: 3.53, memory: 6, score: 44, speedup: 2.08 });
+        batchParallelData.push({ length: 100, workers: 8, time: 3.67, memory: 6, score: 44, speedup: 2.00 });
+        batchParallelData.push({ length: 100, workers: 8, time: 3.98, memory: 6, score: 44, speedup: 1.84 });
+        batchParallelData.push({ length: 500, workers: 1, time: 123.01, memory: 104, score: 225, speedup: 1.22 });
+        batchParallelData.push({ length: 500, workers: 2, time: 76.55, memory: 101, score: 225, speedup: 1.97 });
+        batchParallelData.push({ length: 500, workers: 4, time: 53.33, memory: 101, score: 225, speedup: 2.82 });
+        batchParallelData.push({ length: 500, workers: 8, time: 44.33, memory: 108, score: 225, speedup: 3.40 });
+        batchParallelData.push({ length: 500, workers: 8, time: 50.33, memory: 107, score: 225, speedup: 2.99 });
+        batchParallelData.push({ length: 1000, workers: 1, time: 422.14, memory: 406, score: 441, speedup: 1.21 });
+        batchParallelData.push({ length: 1000, workers: 2, time: 255.96, memory: 399, score: 441, speedup: 2.00 });
+        batchParallelData.push({ length: 1000, workers: 4, time: 201.00, memory: 403, score: 441, speedup: 2.55 });
+        batchParallelData.push({ length: 1000, workers: 8, time: 171.62, memory: 420, score: 441, speedup: 2.99 });
+        batchParallelData.push({ length: 1000, workers: 8, time: 176.95, memory: 420, score: 441, speedup: 2.90 });
+        batchParallelData.push({ length: 2000, workers: 1, time: 1629.40, memory: 1628, score: 890, speedup: 1.25 });
+        batchParallelData.push({ length: 2000, workers: 2, time: 1166.31, memory: 1610, score: 890, speedup: 1.74 });
+        batchParallelData.push({ length: 2000, workers: 4, time: 884.44, memory: 1661, score: 890, speedup: 2.30 });
+        batchParallelData.push({ length: 2000, workers: 8, time: 654.17, memory: 1585, score: 890, speedup: 3.10 });
+        batchParallelData.push({ length: 2000, workers: 8, time: 665.45, memory: 1642, score: 890, speedup: 3.05 });
+
+        
+        // Create charts
+        window.onload = function() {
+            createTimeChart();
+            createSpeedupChart();
+            createMemoryChart();
+            createBatchChart();
+        };
+        
+        function createTimeChart() {
+            const ctx = document.getElementById('timeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Sequential',
+                            data: sequentialData.map(d => ({ x: d.length, y: d.time })),
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Parallel (Auto Workers)',
+                            data: parallelData.filter(d => d.workers === 0).map(d => ({ x: d.length, y: d.time })),
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Sequence Length'
+                            },
+                            type: 'linear'
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Execution Time (ms)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Execution Time vs Sequence Length'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createSpeedupChart() {
+            const ctx = document.getElementById('speedupChart').getContext('2d');
+            
+            // Group by length and create datasets for each worker count
+            const lengths = [...new Set(parallelData.map(d => d.length))].sort((a, b) => a - b);
+            const workerCounts = [...new Set(parallelData.map(d => d.workers))].sort((a, b) => a - b);
+            
+            const datasets = workerCounts.map(workers => {
+                // Choose color based on worker count
+                const hue = (workers * 137) % 360;
+                const color = 'hsl(' + hue + ', 70%, 60%)';
+                
+                return {
+                    label: workers === 0 ? 'Auto Workers' : workers + ' Workers',
+                    data: lengths.map(length => {
+                        const data = parallelData.find(d => d.length === length && d.workers === workers);
+                        return data ? { x: length, y: data.speedup } : null;
+                    }).filter(d => d !== null),
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 1
+                };
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Sequence Length'
+                            },
+                            type: 'linear'
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Speedup Factor (higher is better)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Speedup Factor by Worker Count and Sequence Length'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createMemoryChart() {
+            const ctx = document.getElementById('memoryChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Sequential',
+                            data: sequentialData.map(d => ({ x: d.length, y: d.memory })),
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Parallel (Auto Workers)',
+                            data: parallelData.filter(d => d.workers === 0).map(d => ({ x: d.length, y: d.memory })),
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Sequence Length'
+                            },
+                            type: 'linear'
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Memory Usage (MB)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Memory Usage vs Sequence Length'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createBatchChart() {
+            const ctx = document.getElementById('batchChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Batch Sequential',
+                            data: batchSequentialData.map(d => ({ x: d.length, y: d.time })),
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Batch Parallel (Auto Workers)',
+                            data: batchParallelData.filter(d => d.workers === 0).map(d => ({ x: d.length, y: d.time })),
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Sequence Length'
+                            },
+                            type: 'linear'
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Execution Time (ms)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Batch Processing Time vs Sequence Length'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

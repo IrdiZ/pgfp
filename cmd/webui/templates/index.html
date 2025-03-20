@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smith-Waterman Alignment Tool</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="#">Smith-Waterman Alignment Tool</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">About</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Input Sequences</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="generateRandomSwitch">
+                        <label class="form-check-label" for="generateRandomSwitch">Generate Random Sequences</label>
+                    </div>
+
+                    <div id="randomControls" style="display: none;">
+                        <div class="mb-3">
+                            <label for="randomLength" class="form-label">Sequence Length</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="randomLength" value="100" min="10" max="10000">
+                                <span class="input-group-text">bp</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary mb-3" id="generateBtn">Generate Sequences</button>
+                    </div>
+
+                    <div id="sequenceInputs">
+                        <div class="mb-3">
+                            <label for="querySequence" class="form-label">Query Sequence</label>
+                            <textarea class="form-control monospace" id="querySequence" rows="4" placeholder="Enter DNA sequence (A, C, G, T)">GATTACA</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="referenceSequence" class="form-label">Reference Sequence</label>
+                            <textarea class="form-control monospace" id="referenceSequence" rows="4" placeholder="Enter DNA sequence (A, C, G, T)">GATGACA</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Alignment Settings</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="parallelSwitch" checked>
+                        <label class="form-check-label" for="parallelSwitch">Use Parallel Execution</label>
+                    </div>
+
+                    <div id="parallelControls">
+                        <div class="mb-3">
+                            <label for="workerCount" class="form-label">Worker Count</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="workerCount" value="0" min="0" max="64">
+                                <span class="input-group-text">workers</span>
+                            </div>
+                            <div class="form-text">Use 0 for auto ({{ .CPUCores }} cores detected)</div>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="batchSwitch">
+                        <label class="form-check-label" for="batchSwitch">Batch Processing</label>
+                    </div>
+
+                    <div id="batchControls" style="display: none;">
+                        <div class="mb-3">
+                            <label for="batchSize" class="form-label">Batch Size</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="batchSize" value="10" min="2" max="100">
+                                <span class="input-group-text">sequences</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success" id="alignBtn">Align Sequences</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Alignment Results</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div id="loadingIndicator" style="display: none;">
+                        <div class="d-flex justify-content-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <p class="text-center mt-2">Processing alignment...</p>
+                    </div>
+
+                    <div id="resultsContainer" style="display: none;">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5 class="card-title">Alignment Score: <span id="alignmentScore">-</span></h5>
+                            <span class="badge bg-primary" id="executionTime">-</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Aligned Sequences</label>
+                            <div class="alignment-view" id="alignmentView">
+                                <pre class="alignment-row" id="alignedQuery"></pre>
+                                <pre class="alignment-row" id="alignmentMatch"></pre>
+                                <pre class="alignment-row" id="alignedRef"></pre>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5>Performance Metrics</h5>
+                            <table class="table table-sm">
+                                <tbody>
+                                <tr>
+                                    <th>Execution Mode</th>
+                                    <td id="executionMode">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Execution Time</th>
+                                    <td id="executionTimeDetail">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Memory Usage</th>
+                                    <td id="memoryUsage">-</td>
+                                </tr>
+                                <tr>
+                                    <th>Memory Efficiency</th>
+                                    <td id="memoryEfficiency">-</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="batchResultsCard" class="card mb-4" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title">Batch Results</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover" id="batchResultsTable">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Score</th>
+                                <th>View</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Batch results will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Performance Charts</h5>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4" id="about">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3>About Smith-Waterman Algorithm</h3>
+                    <p>
+                        The Smith-Waterman algorithm is a local sequence alignment method that identifies similar regions between two strings or sequences. It's particularly useful for identifying similar DNA, RNA, or protein sequences.
+                    </p>
+                    <p>
+                        This implementation provides both sequential and parallel versions:
+                    </p>
+                    <ul>
+                        <li><strong>Sequential:</strong> Traditional single-threaded implementation</li>
+                        <li><strong>Parallel:</strong> Multi-threaded implementation using Go goroutines for better performance on longer sequences</li>
+                    </ul>
+                    <p>
+                        The algorithm can detect mutations like:
+                    </p>
+                    <ul>
+                        <li><strong>SNPs (Single Nucleotide Polymorphisms):</strong> Single base changes</li>
+                        <li><strong>Insertions:</strong> Added bases</li>
+                        <li><strong>Deletions:</strong> Removed bases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for batch result details -->
+<div class="modal fade" id="batchDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Batch Result Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Alignment Score: <span id="modalAlignmentScore">-</span></label>
+                    <div class="alignment-view">
+                        <pre class="alignment-row" id="modalAlignedQuery"></pre>
+                        <pre class="alignment-row" id="modalAlignmentMatch"></pre>
+                        <pre class="alignment-row" id="modalAlignedRef"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-light py-3 mt-5">
+    <div class="container text-center">
+        <p class="mb-0">Made with <3 By HPC Group 5 &copy; 2025</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>

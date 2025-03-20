@@ -1,0 +1,118 @@
+/* General Styles */
+body {
+    background-color: #f8f9fa;
+}
+
+.monospace {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+/* Alignment View Styles */
+.alignment-view {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.alignment-row {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Match marks */
+.match-mark-match {
+    color: #28a745;
+}
+
+.match-mark-mismatch {
+    color: #dc3545;
+}
+
+.match-mark-gap {
+    color: #6c757d;
+}
+
+/* Highlighting */
+.highlight-snp {
+    background-color: #ffcc80;
+    font-weight: bold;
+}
+
+.highlight-insertion {
+    background-color: #a5d6a7;
+    font-weight: bold;
+}
+
+.highlight-deletion {
+    background-color: #ef9a9a;
+    font-weight: bold;
+}
+
+/* Card and container styles */
+.chart-container {
+    position: relative;
+    margin: auto;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: none;
+}
+
+.card-body {
+    position: relative;
+}
+
+/* Performance metrics */
+.performance-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.performance-good {
+    background-color: #28a745;
+}
+
+.performance-medium {
+    background-color: #ffc107;
+}
+
+.performance-poor {
+    background-color: #dc3545;
+}
+
+/* Scrollable containers */
+.scrollable-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Batch results table */
+#batchResultsTable {
+    font-size: 0.9rem;
+}
+
+#batchResultsTable .btn-sm {
+    padding: 0.1rem 0.4rem;
+    font-size: 0.8rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .col-md-6 {
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}

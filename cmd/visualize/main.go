@@ -51,7 +51,7 @@ func main() {
 
 	// Validate flags
 	if !*runServer && *outputPath == "" {
-		fmt.Fprintln(os.Stderr, "Error: must specify either -server or -output")
+		_, _ = fmt.Fprintln(os.Stderr, "Error: must specify either -server or -output")
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -67,7 +67,7 @@ func main() {
 		reference = *refSeq
 
 		if query == "" || reference == "" {
-			fmt.Fprintln(os.Stderr, "Error: must provide both query and reference sequences, or use -random flag")
+			_, _ = fmt.Fprintln(os.Stderr, "Error: must provide both query and reference sequences, or use -random flag")
 			flag.Usage()
 			os.Exit(1)
 		}
@@ -137,7 +137,7 @@ func main() {
 
 // generateVisualization creates an HTML visualization of an alignment and saves it to a file
 func generateVisualization(alignResult align.AlignmentResult, outputPath string) error {
-	// Create a visualization data object
+	// Create a visualization d object
 	visualData := VisualizationData{
 		AlignedQuery: alignResult.AlignedQuery,
 		AlignedRef:   alignResult.AlignedRef,
@@ -148,11 +148,11 @@ func generateVisualization(alignResult align.AlignmentResult, outputPath string)
 	// Convert to JSON for use in the template
 	jsonData, err := json.Marshal(visualData)
 	if err != nil {
-		return fmt.Errorf("error marshaling visualization data: %v", err)
+		return fmt.Errorf("error marshaling visualization d: %v", err)
 	}
 
-	// Create template data
-	data := struct {
+	// Create template d
+	d := struct {
 		AlignedQuery string
 		AlignedRef   string
 		Score        int
@@ -182,7 +182,7 @@ func generateVisualization(alignResult align.AlignmentResult, outputPath string)
 	defer file.Close()
 
 	// Execute the template
-	err = tmpl.Execute(file, data)
+	err = tmpl.Execute(file, d)
 	if err != nil {
 		return fmt.Errorf("error executing template: %v", err)
 	}

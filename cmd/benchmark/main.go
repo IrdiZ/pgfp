@@ -51,7 +51,7 @@ func main() {
 	case "all":
 		modesToRun = []ExecutionMode{Sequential, Parallel, BatchSequential, BatchParallel}
 	default:
-		fmt.Fprintf(os.Stderr, "Invalid mode: %s\n", *modeFlag)
+		_, _ = fmt.Fprintf(os.Stderr, "Invalid mode: %s\n", *modeFlag)
 		os.Exit(1)
 	}
 
@@ -59,12 +59,17 @@ func main() {
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not create CPU profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not create CPU profile: %v\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		defer func(f *os.File) {
+			err := f.Close()
+			if err != nil {
+
+			}
+		}(f)
 		if err := pprof.StartCPUProfile(f); err != nil {
-			fmt.Fprintf(os.Stderr, "Could not start CPU profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not start CPU profile: %v\n", err)
 			os.Exit(1)
 		}
 		defer pprof.StopCPUProfile()
@@ -155,13 +160,18 @@ func main() {
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not create memory profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not create memory profile: %v\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		defer func(f *os.File) {
+			err := f.Close()
+			if err != nil {
+
+			}
+		}(f)
 		runtime.GC() // Run GC before taking memory profile
 		if err := pprof.WriteHeapProfile(f); err != nil {
-			fmt.Fprintf(os.Stderr, "Could not write memory profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not write memory profile: %v\n", err)
 			os.Exit(1)
 		}
 		fmt.Printf("Memory profile written to %s\n", *memprofile)

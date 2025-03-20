@@ -27,8 +27,8 @@ func main() {
 	// Define command-line flags
 	config := ProfileConfig{}
 
-	flag.StringVar(&config.CPUProfile, "cpuprofile", "", "write cpu profile to file")
-	flag.StringVar(&config.MemProfile, "memprofile", "", "write memory profile to file")
+	flag.StringVar(&config.CPUProfile, "cProfile", "", "write cpu profile to file")
+	flag.StringVar(&config.MemProfile, "profiler", "", "write memory profile to file")
 	flag.StringVar(&config.Mode, "mode", "sequential", "alignment mode: sequential, parallel, or batch")
 	flag.IntVar(&config.SequenceLen, "length", 1000, "sequence length")
 	flag.IntVar(&config.NumWorkers, "workers", 0, "number of workers (0 = auto)")
@@ -40,12 +40,18 @@ func main() {
 	if config.CPUProfile != "" {
 		f, err := os.Create(config.CPUProfile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not create CPU profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not create CPU profile: %v\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		defer func(f *os.File) {
+			err := f.Close()
+			if err != nil {
+				_, _ = fmt.Fprintf(os.Stderr, "Could not close CPU profile: %v\n", err)
+				os.Exit(1)
+			}
+		}(f)
 		if err := pprof.StartCPUProfile(f); err != nil {
-			fmt.Fprintf(os.Stderr, "Could not start CPU profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not start CPU profile: %v\n", err)
 			os.Exit(1)
 		}
 		defer pprof.StopCPUProfile()
@@ -98,7 +104,7 @@ func main() {
 			result = align.ConcurrentSmithWatermanBatch(query, references, config.NumWorkers)
 
 		default:
-			fmt.Fprintf(os.Stderr, "Invalid mode: %s\n", config.Mode)
+			_, _ = fmt.Fprintf(os.Stderr, "Invalid mode: %s\n", config.Mode)
 			os.Exit(1)
 		}
 
@@ -121,12 +127,12 @@ func main() {
 	case "sequential":
 		res := result.(align.AlignmentResult)
 		fmt.Printf("Alignment score: %d\n", res.MaxScore)
-		printShortAlignment(res.AlignedQuery, res.AlignedRef, res.MaxScore)
+		printShortAlignment(res.AlignedQuery, res.AlignedRef)
 
 	case "parallel":
 		res := result.(align.ParallelAlignmentResult)
 		fmt.Printf("Alignment score: %d (at position [%d,%d])\n", res.MaxScore, res.MaxRow, res.MaxCol)
-		printShortAlignment(res.AlignedQuery, res.AlignedRef, res.MaxScore)
+		printShortAlignment(res.AlignedQuery, res.AlignedRef)
 
 	case "batch":
 		results := result.([]align.AlignmentResult)
@@ -137,20 +143,25 @@ func main() {
 		}
 		fmt.Printf("Average alignment score: %.1f\n", float64(totalScore)/float64(len(results)))
 		fmt.Printf("First alignment score: %d\n", results[0].MaxScore)
-		printShortAlignment(results[0].AlignedQuery, results[0].AlignedRef, results[0].MaxScore)
+		printShortAlignment(results[0].AlignedQuery, results[0].AlignedRef)
 	}
 
 	// Memory profiling if requested
 	if config.MemProfile != "" {
 		f, err := os.Create(config.MemProfile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not create memory profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not create memory profile: %v\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		defer func(f *os.File) {
+			err := f.Close()
+			if err != nil {
+
+			}
+		}(f)
 		runtime.GC() // Run GC before taking memory profile
 		if err := pprof.WriteHeapProfile(f); err != nil {
-			fmt.Fprintf(os.Stderr, "Could not write memory profile: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "Could not write memory profile: %v\n", err)
 			os.Exit(1)
 		}
 		fmt.Printf("Memory profile written to %s\n", config.MemProfile)
@@ -187,7 +198,7 @@ func main() {
 }
 
 // printShortAlignment displays the first part of an alignment
-func printShortAlignment(query, reference string, score int) {
+func printShortAlignment(query, reference string) {
 	maxLen := 50
 	if len(query) > maxLen {
 		query = query[:maxLen] + "..."

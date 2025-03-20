@@ -179,7 +179,12 @@ func generateVisualization(alignResult align.AlignmentResult, outputPath string)
 	if err != nil {
 		return fmt.Errorf("error creating output file: %v", err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Printf("Error closing output file: %v", err)
+		}
+	}(file)
 
 	// Execute the template
 	err = tmpl.Execute(file, d)
@@ -205,12 +210,12 @@ func serveVisualization(alignResult align.AlignmentResult, port int) error {
 		// Convert to JSON for use in the template
 		jsonData, err := json.Marshal(visualData)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Error marshaling data: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error marshaling d: %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		// Create template data
-		data := struct {
+		// Create template d
+		d := struct {
 			AlignedQuery string
 			AlignedRef   string
 			Score        int
@@ -233,7 +238,7 @@ func serveVisualization(alignResult align.AlignmentResult, port int) error {
 			return
 		}
 
-		err = tmpl.Execute(w, data)
+		err = tmpl.Execute(w, d)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error executing template: %v", err), http.StatusInternalServerError)
 			return

@@ -272,7 +272,7 @@ func handleAlign(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleSystemInfo returns information about the system
-func handleSystemInfo(w http.ResponseWriter, r *http.Request) {
+func handleSystemInfo(w http.ResponseWriter, _ *http.Request) {
 	// Gather system information
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)

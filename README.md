@@ -1,178 +1,115 @@
-# 🧬 Smith-Waterman Sequence Alignment Suite (for now) 🧬
+# pgfp
 
-A comprehensive toolkit for DNA sequence alignment using the Smith-Waterman algorithm, featuring high-performance parallel implementation, interactive visualization, and real-time performance analysis.
+DNA sequence alignment in Go: a sequential and a parallel version of the Smith-Waterman algorithm, with benchmarks and a small web UI.
 
-## 📁 Project Structure
+## Context
 
-```
-├── align/
-│   ├── smith_waterman.go             # Sequential implementation
-│   ├── parallel_smith_waterman.go    # Parallel implementation
-│   ├── benchmark_test.go             # Performance tests
-│   └── smith_waterman_test.go        # Test Suite for S_W
-├── data/
-│   ├── dna.go                        # DNA sequence utilities
-│   └── dna_test.go                   # Testing utilities
-├── cmd/
-│   ├── benchmark/                    # Benchmarking tools
-│   │   └── main.go
-│   ├── profile/                      # Profiling tools
-│   │   └── main.go
-│   ├── visualize/                    # Visualization utilities
-│   │   └── main.go
-│   │ 
-│   └── webui/                        # Web interface
-│       ├── README.md
-│       ├── main.go
-│       ├── templates/
-│       │   └── index.html
-│       └── static/
-│           ├── css/
-│           │   └── styles.css
-│           └── js/
-│               └── main.js
-└── README.md                         # Documentation
-```
+Built as part of a university group project. This repository contains my implementation.
 
-## ✨ Key Features
+## What it does
 
-### 🚀 High-Performance Algorithms
+- Aligns two DNA sequences with the Smith-Waterman local alignment algorithm.
+- Has a sequential version (`align/smith_waterman.go`).
+- Has a parallel version that uses goroutines (`align/parallel_smith_waterman.go`).
+- Can align one query against many references at the same time (batch mode).
+- Includes tools to benchmark, profile and visualize alignments.
+- Includes a web UI to run alignments and compare run times.
 
-- **💻 Sequential Smith-Waterman**
-    - Traditional single-threaded implementation
-    - Baseline for performance comparison
-    - Optimized matrix calculation and traceback
+## Quick start
 
-- **⚡ Parallel Smith-Waterman**
-    - Multi-threaded implementation using goroutines
-    - Wave-front parallelization approach
-    - Configurable worker count
-    - Up to 5x speedup on large sequences
-
-- **📦 Batch Processing**
-    - Concurrent alignment of multiple sequences
-    - Efficient workload distribution
-    - Perfect for genomic database searches
-
-### 🔍 Analysis & Profiling
-
-- **📊 Benchmarking Suite**
-    - Comprehensive performance testing
-    - Comparison of sequential vs. parallel implementations
-    - Memory usage analysis
-    - Scalability testing across sequence lengths
-
-- **🧰 Profiling Toolkit**
-    - CPU and memory profiling
-    - Execution time measurement
-    - Resource usage tracking
-    - Performance bottleneck identification
-
-### 🌐 Web Interface
-
-- **📋 Sequence Input**
-    - Direct entry of DNA sequences
-    - Random sequence generation
-    - Batch sequence processing
-
-- **⚙️ Execution Controls**
-    - Toggle between sequential and parallel algorithms
-    - Configure worker count
-    - Enable/disable batch processing
-
-- **📈 Performance Monitoring**
-    - Real-time execution timing
-    - Memory usage tracking
-    - Interactive performance charts
-    - Historical data comparison
-
-- **🔬 Alignment Visualization**
-    - Interactive sequence viewer
-    - Color-coded matches, mismatches, and gaps
-    - Mutation detection and highlighting
-    - Batch results comparison
-
-### 🎨 Visualization Tools
-
-- **🖼️ Static HTML Reports**
-    - Standalone alignment visualization
-    - Mutation analysis and statistics
-    - Shareable results
-
-- **🌍 Interactive Web Visualizer**
-    - Browser-based alignment explorer
-    - Realtime mutation detection
-    - Sequence highlighting
-
-## 🚀 Usage Examples
-
-### 🖥️ Web UI
+You need Go 1.24 or newer.
 
 ```bash
-# Start the web interface
-go run cmd/webui/main.go
-# Access at http://localhost:8080
-```
-
-### 📊 Benchmarking
-
-```bash
-# Run benchmarks across different sequence lengths
-go run cmd/benchmark/main.go --mode=all --lengths=100,500,1000,2000
-```
-
-### 🔍 Profiling
-
-```bash
-# Profile parallel execution
-go run cmd/profile/main.go --mode=parallel --length=2000 --workers=4 --cpuprofile=cpu.prof
-```
-
-### 🎨 Visualization
-
-```bash
-# Generate visualization of an alignment
-go run cmd/visualize/main.go --output=report.html --query=GATTACA --reference=GATCACA
-
-# Start visualization server
-go run cmd/visualize/main.go --server --port=8081 --random --length=1000
-```
-
-## 🧪 Testing
-
-```bash
-# Run all tests
+# Run the tests
 go test ./...
 
-# Run benchmarks
+# Run the Go benchmarks in the align package
 go test -bench=. ./align
+
+# Run the demo in the root package
+go run .
+
+# Benchmark all modes (sequential, parallel, batch-seq, batch-par)
+go run ./cmd/benchmark --mode=all --length=1000 --workers=4
+
+# Profile one mode (writes a CPU profile)
+go run ./cmd/profile --mode=parallel --length=2000 --workers=4 --cProfile=cpu.prof
+
+# Write an HTML report for one alignment
+go run ./cmd/visualize --output=report.html --query=GATTACA --reference=GATCACA
+
+# Start the web UI, then open http://localhost:8080
+go run ./cmd/webui
 ```
 
-## 🔧 Technical Details
+## Benchmarks
 
-- **🧬 Mutation Detection**
-    - Single Nucleotide Polymorphisms (SNPs)
-    - Insertions and deletions (indels)
-    - Complex mutation patterns
+The numbers below come from `benchmark_results.html` in this repository. Each row compares the parallel run with 8 workers against the sequential run on the same input. The file does not record which machine produced them, so treat them as rough.
 
-- **⚙️ Parallelization Strategy**
-    - Wave-front decomposition
-    - Row/column partitioning
-    - Optimized for multi-core processors
+| Mode | Sequence length | Sequential (ms) | Parallel, 8 workers (ms) | Speedup |
+|---|---|---|---|---|
+| Batch | 100 | 7.33 | 3.67 | 2.00x |
+| Batch | 500 | 150.66 | 44.33 | 3.40x |
+| Batch | 1000 | 512.61 | 171.62 | 2.99x |
+| Batch | 2000 | 2029.84 | 654.17 | 3.10x |
+| Single pair | 1000 | 9.91 | 100.67 | 0.10x |
+| Single pair | 2000 | 41.01 | 374.84 | 0.11x |
 
-- **📉 Performance Characteristics**
-    - Parallel algorithm scales with sequence length
-    - Optimal for sequences > 500 bp
-    - Memory usage optimized for large datasets
+Batch mode reaches up to 3.40x. The parallel version for a single pair of sequences is slower than the sequential one in these runs (see "Known limits").
 
-## 🏆 Advantages
+## How it works
 
-- **⏱️ Speed**: Significant speedup through parallelization
-- **📱 Usability**: Intuitive web interface for non-technical users
-- **📊 Analysis**: Comprehensive performance insights
-- **🧩 Flexibility**: Command-line and web-based interfaces
-- **🔧 Extensibility**: Modular design for easy enhancement
+Smith-Waterman fills a score matrix. Cell (i, j) depends on its three neighbors: (i-1, j-1), (i-1, j) and (i, j-1). A traceback from the highest score gives the best local alignment.
 
----
+Sequential version: fill the matrix row by row, then trace back.
 
-🧬 **Smith-Waterman Sequence Alignment Suite** - Making DNA analysis faster, easier, and more insightful.
+Parallel version (single pair): cells on the same anti-diagonal (i + j = constant) do not depend on each other. The code starts one goroutine per anti-diagonal and tracks the maximum score under a mutex.
+
+```
+        j ->
+      0  1  2  3  4
+  i   1  a  b  c  d      cells with the same letter are on one
+  |   2  b  c  d  e      anti-diagonal and can be computed
+  v   3  c  d  e  f      at the same time
+```
+
+Batch version: one query is aligned against many references. Each alignment runs the sequential algorithm in its own goroutine. A semaphore limits the number of goroutines to the worker count. The alignments are independent, so this part scales well.
+
+## Known limits
+
+- The single-pair parallel version starts all anti-diagonal goroutines at once and does not make a later diagonal wait for the earlier one. The scores in the benchmark file for this mode (for example 15 instead of 53 at length 100) also differ from the sequential scores. Do not rely on it for correct results until this is fixed.
+- Creating one goroutine per diagonal costs more than the work it does, so this mode is slower than the sequential version.
+- Sequences shorter than 50 bases fall back to the sequential code.
+- The benchmark file has no machine information and is a single saved run.
+
+## Web UI
+
+`go run ./cmd/webui` starts a local server on port 8080. In the browser you can:
+
+- enter DNA sequences or generate random ones;
+- choose sequential or parallel mode and the worker count;
+- run batch alignments;
+- see the alignment with matches, mismatches and gaps colored;
+- see run time and memory use, with a history chart.
+
+More detail is in `cmd/webui/README.md`.
+
+## Project layout
+
+```
+align/                         Smith-Waterman code and tests
+  smith_waterman.go            sequential version
+  parallel_smith_waterman.go   parallel and batch versions
+  smith_waterman_test.go       tests
+  benchmark_test.go            Go benchmarks
+data/
+  data.go, data_test.go        DNA sequence helpers
+cmd/
+  benchmark/  profile/  visualize/  webui/
+main.go                        demo
+benchmark_results.html         saved benchmark run
+```
+
+## License
+
+MIT. See [LICENSE](LICENSE).

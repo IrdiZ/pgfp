@@ -25,7 +25,7 @@ This project provides a web-based interface for running the Smith-Waterman seque
 ## Getting Started
 
 ### Prerequisites
-- Go 1.18 or higher
+- Go 1.24 or newer
 - Web browser with JavaScript enabled
 
 ### Running the Web UI
